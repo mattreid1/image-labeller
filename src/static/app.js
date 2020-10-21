@@ -10,12 +10,12 @@ $(document).ready(function () {
 
 	$.getJSON("/api/listImages", (imageArr) => {
 		changeImage(imageArr[i]);
-		$("#progress").html(`${i}/${imageArr.length} (${parseFloat((i/imageArr.length * 100).toFixed(2))}% done)`)
+		$("#progress").html(`${i}/${imageArr.length} (${parseFloat((i / imageArr.length * 100).toFixed(2))}% done)`)
 
 		$("body").keypress((eventData) => {
 			const key = eventData.key.toLowerCase();
 			if (isNumeric(key)) {
-				if (parseInt(key) <= labels.length) handleLabel(imageArr[i], parseInt(key));
+				if (parseInt(key) <= labels.length) handleLabel(parseInt(key));
 			}
 
 			if (key == "q") {
@@ -23,14 +23,21 @@ $(document).ready(function () {
 			}
 		});
 
-		function handleLabel(image, label) {
+		for (let j = 0; j < labels.length; j++) {
+			$(`#labelBtn${j}`).on("click", () => handleLabel(j + 1));
+		}
+
+		$("#undoBtn").on("click", () => undo());
+
+		function handleLabel(label) {
+			const image = imageArr[i];
 			$("#undoBtn").prop('disabled', false);
 			i++;
 			labelStack.push({ "image": image, "label": label });
 			$.getJSON(`/api/label?image=${image}&label=${label}`); // Assume worked?
 			changeImage(imageArr[i]);
-			$("#progress").html(`${i}/${imageArr.length} (${parseFloat((i/imageArr.length * 100).toFixed(2))}% done)`);
-			alertMsg("primary", `Marked '${image}' as '${labels[label-1]}'`);
+			updateProgress();
+			alertMsg("primary", `Marked '${image}' as '${labels[label - 1]}'`);
 		}
 
 		function undo() {
@@ -40,10 +47,11 @@ $(document).ready(function () {
 					i--;
 					changeImage(imageArr[i]);
 					alertMsg("warning", `Undid '${item.image}'`);
+					updateProgress();
+					if (i == 0) {
+						$("#undoBtn").prop('disabled', true);
+					}
 				});
-				if (i == 0) {
-					$("#undoBtn").prop('disabled', true);
-				}
 			} else {
 				alertMsg("danger", "Cannot undo any further!");
 			}
@@ -51,6 +59,10 @@ $(document).ready(function () {
 
 		function changeImage(image) {
 			$("#image").attr("src", `/images/${image}`);
+		}
+
+		function updateProgress() {
+			$("#progress").html(`${i}/${imageArr.length} (${parseFloat((i / imageArr.length * 100).toFixed(2))}% done)`);
 		}
 	});
 });
