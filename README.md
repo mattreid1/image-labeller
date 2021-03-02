@@ -7,7 +7,7 @@ No images are duplicated either. It simply moves the image files into folders in
 
 The unlabeled image input data should be just a folder full of images with no other directories inside (in the example below it's `~/Desktop/images`).
 
-The output directory (in the example below it's `~/Desktop/output`) should be empty the first time you run the application. You can stop the container and start again at any point without losing you data, however.
+The output directory (in the example below it's `~/Desktop/output`) should be empty the first time you run the application. You can stop the container and start again at any point without losing your data, however.
 
 ## Setup
 1. Install [Docker](https://docs.docker.com/engine/install/).
